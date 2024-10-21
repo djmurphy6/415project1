@@ -15,7 +15,10 @@ void memF(void *address) {
 
 // function to translate user inputted command into a function call
 void translator(char **userCom, int numTok){
-    
+    if (userCom == NULL || numTok < 1) {
+    printf("Error! Invalid command input.\n");
+    }
+
     if(strcmp(userCom[0], "ls") == 0) {     // ls
             if(numTok == 1) {
             listDir();
