@@ -91,6 +91,9 @@ int main(int argc, char const *argv[]){
 
             translator(token_buffer.command_list, token_buffer.num_token);
 
+            // Free the command_line memory after using it
+            free_command_line(&token_buffer);
+
 
             // Exit if the command is "exit"
             if (strcmp(com, "exit") == 0) {
@@ -98,7 +101,8 @@ int main(int argc, char const *argv[]){
                 return 0;
             }
         }
-    return 0;    
+        free(com);
+        return 0;
     } else {
         if(argc == 3){ //checking for command line argument && (strcmp(argv[1], "f") == 0)
             //opening file to read

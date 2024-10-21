@@ -22,7 +22,7 @@ void listDir() {
     }
 
     closedir(dir);
-    printf("\n");
+    printf(" \n");
 }
 
 /*for the pwd command*/
