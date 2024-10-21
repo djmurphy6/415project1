@@ -138,7 +138,9 @@ void moveFile(char *sourcePath, char *destinationPath) {
 
 /*for the rm command*/
 void deleteFile(char *filename) {
-    remove(filename);
+    int result = remove(filename);
+    if (result != 0)
+        perror_stdout("fm error");
 }
 
 /*for the cat command*/
@@ -167,14 +169,5 @@ void displayFile(char *filename) {
     }
 
     close(fd);
-			
-	/* Write the line to stdout */
-			
-    /* write 80 "-" characters to stdout */
-			
-	//for(int i = 0; i < 80; i ++){
-	//	write(STDOUT_FILENO, "-", strlen("-"));
-	//}
-	/* close the read file and free/null assign your line buffer */
 	write(STDOUT_FILENO, "\n", 1);
 }

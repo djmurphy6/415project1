@@ -147,7 +147,7 @@ int main(int argc, char const *argv[]){
                 for (int i = 0; large_token_buffer.command_list[i] != NULL; i++)
                 {
                     
-                    //printf("Large token buffer: %s\n", large_token_buffer.command_list[i]);
+                    //printf("processing command: %s\n", large_token_buffer.command_list[i]);
                     fflush(stdout);
                     //tokenize large buffer
                     //smaller token is seperated by " "(space bar)
