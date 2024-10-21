@@ -155,7 +155,7 @@ void displayFile(char *filename) {
 	char buffer[1024];
     ssize_t bytes;
 	
-    while ((bytes = read(fd, buffer, sizeof(buffer))) != 0){
+    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0){
 	    write(STDOUT_FILENO, buffer, bytes);
 	}
 
