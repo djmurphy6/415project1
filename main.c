@@ -170,7 +170,7 @@ int main(int argc, char const *argv[]){
             fclose(inFPtr);
             //free line buffer
             free (line_buf);
-            printf("End of file\nBye Bye");
+            printf("End of file\nBye Bye\n");
 
             // Restore stdout back to the console
             fclose(outFPtr); // Close the output file
