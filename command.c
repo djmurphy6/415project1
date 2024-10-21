@@ -145,6 +145,7 @@ void deleteFile(char *filename) {
 void displayFile(char *filename) {
 	// open file
     int fd;
+
 	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
         perror_stdout("Error opening file to display!");
@@ -155,7 +156,7 @@ void displayFile(char *filename) {
 	char buffer[1024];
     ssize_t bytes;
 	
-    while ((bytes = read(fd, buffer, sizeof(buffer))) > 0){
+    while ((bytes = read(fd, buffer, 1024)) > 0){
 	    write(STDOUT_FILENO, buffer, bytes);
 	}
 
