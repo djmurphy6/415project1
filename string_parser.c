@@ -23,8 +23,12 @@ int count_token (char* buf, const char* delim)
 	//copy buffer into string
 
 	char *bufString = malloc(strlen(buf)+1);
+	if (bufString == NULL) {
+    return -1;
+	}
+
 	strcpy(bufString, buf);
-	bufString[strlen(buf)] = '\0';
+	//bufString[strlen(buf)] = '\0';
 
 	//Iterate through string counting tokens
 	int tnum = 0;
@@ -57,6 +61,10 @@ command_line str_filler (char* buf, const char* delim)
 	//printf("Buffer: %s", buf);
 	char *token = strtok_r(buf, delim, &saveptr);
 	for(int i=0; i<clvar.num_token; i++) {
+		if (token == NULL) {
+        // Handle the case where there are fewer tokens than expected
+        return clvar; //i may want to handle this better
+    }
 		clvar.command_list[i] = (char *)malloc(((strlen(token))+1)*sizeof(char));
 		strcpy(clvar.command_list[i], token);
 		clvar.command_list[i][strlen(token)] = '\0';
@@ -84,12 +92,10 @@ command_line str_filler (char* buf, const char* delim)
 
 void free_command_line(command_line* command)
 {
-	
-	for(int i=0; i < command->num_token; i++) {
-		free(command->command_list[i]);
+	if (command != NULL && command->command_list != NULL) {
+		for(int i=0; i < command->num_token; i++) {
+			free(command->command_list[i]);
+		}
+		free(command->command_list);
 	}
-	free(command->command_list);
-	/*
-	*	#1.	free the array base num_token
-	*/
 }
