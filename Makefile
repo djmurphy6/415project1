@@ -2,7 +2,7 @@ all : pseudo-shell
 	
 	
 pseudo-shell: main.o command.o string_parser.o
-	gcc -o pseudo-shell main.o command.o string_parser.o
+	gcc -g -o pseudo-shell main.o command.o string_parser.o
 	
 main.o: main.c
 	gcc -c main.c
