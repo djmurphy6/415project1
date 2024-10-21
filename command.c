@@ -47,7 +47,10 @@ void makeDir(char *dirName) {
 
 /*for the cd command*/
 void changeDir(char *dirName) {
-    chdir(dirName);
+    int result = chdir(dirName);
+    if (result == -1) {
+        printf("Error: Could not change directory to '%s'.\n", dirName);
+    }
 }
 
 /*for the cp command*/
@@ -55,15 +58,15 @@ void copyFile(char *sourcePath, char *destinationPath) {
     // Open the source file for reading
     int src_fd = open(sourcePath, O_RDONLY);
     if (src_fd == -1) {
-        perror("Error opening source file");
+        printf("Error opening source file");
         return;
     }
 
-    // Open (or create) the destination file for writing, with appropriate permissions
+    // Open/create destination file for writing
     int dest_fd = open(destinationPath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest_fd == -1) {
-        perror("Error opening destination file");
-        close(src_fd);  // Make sure to close the source file if destination fails
+        printf("Error opening destination file");
+        close(src_fd);  //close the source file if destination fails
         return;
     }
 
@@ -75,7 +78,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
     while ((bytesRead = read(src_fd, buffer, sizeof(buffer))) > 0) {
         ssize_t bytesWritten = write(dest_fd, buffer, bytesRead);
         if (bytesWritten == -1) {
-            perror("Error writing to destination file");
+            printf("Error writing to destination file");
             close(src_fd);
             close(dest_fd);
             return;
@@ -84,7 +87,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
 
     // Check if there was an error during reading
     if (bytesRead == -1) {
-        perror("Error reading source file");
+        printf("Error reading source file");
     }
 
     // Close the file descriptors
@@ -94,7 +97,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
 
 /*for the mv command*/
 void moveFile(char *sourcePath, char *destinationPath) {
-    // copy file over
+    copyFile(sourcePath, destinationPath);
 
     // delete file from source path
     remove(sourcePath);
@@ -111,7 +114,7 @@ void displayFile(char *filename) {
     int fd;
 	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
-        perror("open() error");
+        printf("open() error");
         return;
     }		
 			
