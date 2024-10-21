@@ -41,7 +41,7 @@ void showCurrentDir() {
 void makeDir(char *dirName) { 
     int error = mkdir(dirName, 0777);
     if (error == -1) {
-        printf("Directory already exists!");
+        printf("Directory already exists!\n");
     }
 }
 
@@ -50,7 +50,7 @@ void changeDir(char *dirName) {
     int result = chdir(dirName);
     if (result == -1) {
         printf("Error: Could not change directory to '%s'.\n", dirName);
-    }
+    } 
 }
 
 /*for the cp command*/
@@ -58,14 +58,14 @@ void copyFile(char *sourcePath, char *destinationPath) {
     // Open the source file for reading
     int src_fd = open(sourcePath, O_RDONLY);
     if (src_fd == -1) {
-        printf("Error opening source file");
+        printf("Error opening source file\n");
         return;
     }
 
     // Open/create destination file for writing
     int dest_fd = open(destinationPath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest_fd == -1) {
-        printf("Error opening destination file");
+        printf("Error opening destination file\n");
         close(src_fd);  //close the source file if destination fails
         return;
     }
@@ -78,7 +78,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
     while ((bytesRead = read(src_fd, buffer, sizeof(buffer))) > 0) {
         ssize_t bytesWritten = write(dest_fd, buffer, bytesRead);
         if (bytesWritten == -1) {
-            printf("Error writing to destination file");
+            printf("Error writing to destination file\n");
             close(src_fd);
             close(dest_fd);
             return;
@@ -87,7 +87,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
 
     // Check if there was an error during reading
     if (bytesRead == -1) {
-        printf("Error reading source file");
+        printf("Error reading source file\n");
     }
 
     // Close the file descriptors
@@ -114,7 +114,7 @@ void displayFile(char *filename) {
     int fd;
 	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
-        printf("open() error");
+        printf("Error opening file to display!\n");
         return;
     }		
 			
@@ -129,7 +129,7 @@ void displayFile(char *filename) {
 	
     // Handle read error
     if (bytes == -1) {
-        printf("read() error");
+        printf("Error reading file!\n");
     }
 
     close(fd);
