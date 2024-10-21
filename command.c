@@ -13,7 +13,7 @@ void listDir() {
     struct dirent *entry;
 
     if(dir == NULL){
-        perror("opendir() error");
+        printf("opendir() error");
     }
 
     // read each file in dir
@@ -33,13 +33,16 @@ void showCurrentDir() {
         printf("%s\n", cwd);
         free(cwd); 
     } else {
-        perror("getcwd() error");
+        printf("getcwd() error");
     }
 }
 
 /*for the mkdir command*/
 void makeDir(char *dirName) { 
-    mkdir(dirName, 0777);
+    int error = mkdir(dirName, 0777);
+    if (error == -1) {
+        printf("Directory already exists!");
+    }
 }
 
 /*for the cd command*/
@@ -69,17 +72,26 @@ void displayFile(char *filename) {
 	// open file
     int fd;
 	fd = open(filename, O_RDONLY);
-			
+	if (fd == -1) {
+        perror("open() error");
+        return;
+    }		
 			
 	/* Read in each line using getline() */
 	char buffer[1024];
-
-	size_t bytes;
-	while ((bytes = read(fd, buffer, sizeof(buffer))) != 0){
+    ssize_t bytes;
+	
+    while ((bytes = read(fd, buffer, sizeof(buffer))) != 0){
 	    write(STDOUT_FILENO, buffer, bytes);
 	}
 
-	close(fd);
+	
+    // Handle read error
+    if (bytes == -1) {
+        printf("read() error");
+    }
+
+    close(fd);
 			
 	/* Write the line to stdout */
 			

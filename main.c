@@ -15,6 +15,7 @@ void memF(void *address) {
 
 // function to translate user inputted command into a function call
 void translator(char **userCom, int numTok){
+    // check to see if it is empty first so that there is no seg fault
     if (userCom == NULL || numTok < 1) {
     printf("Error! Invalid command input.\n");
     } else if(strcmp(userCom[0], "ls") == 0) {     // ls
@@ -109,10 +110,27 @@ int main(int argc, char const *argv[]){
             //opening file to read
             FILE *inFPtr;
             inFPtr = fopen (argv[2], "r");
+            if(inFPtr == NULL) {
+                printf("Error opening file");
+                return 1;
+            }
 
-            //declear line_buffer
+            // Redirect stdout to output.txt
+            FILE *outFPtr = freopen("output.txt", "w", stdout);
+            if(outFPtr == NULL) {
+                printf("Error redirecting stdout to output.txt");
+                fclose(inFPtr); // Close the input file
+                return 1;
+            }
+
+            //declare line_buffer
             size_t len = 128;
             char* line_buf = malloc (len);
+            if (line_buf == NULL) {
+                printf("Error allocating memory for line_buf");
+                fclose(inFPtr); // Close the file 
+                return 1;
+            }
 
             command_line large_token_buffer;
             command_line small_token_buffer;
@@ -120,7 +138,7 @@ int main(int argc, char const *argv[]){
             int line_num = 0;
 
             //loop until the file is over
-            while (getline (&line_buf, &len, inFPtr) != -1)
+            while (getline(&line_buf, &len, inFPtr) != -1)
             {
                 //tokenize line buffer
                 //large token is seperated by ";"
@@ -128,16 +146,17 @@ int main(int argc, char const *argv[]){
                 //iterate through each large token
                 for (int i = 0; large_token_buffer.command_list[i] != NULL; i++)
                 {
+                    
+                    //printf("Large token buffer %s\n", large_token_buffer.command_list[i]);
                     //tokenize large buffer
                     //smaller token is seperated by " "(space bar)
                     small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
 
-                    //iterate through each smaller token to print
-                    for (int j = 0; small_token_buffer.command_list[j] != NULL; j++)
-                    {
-                        // printf("Small token buffer %s\n", small_token_buffer.command_list[j]);
-                        translator(small_token_buffer.command_list, small_token_buffer.num_token);
-                    }
+                    // DEBUG print: print the full command and its parameters
+                    //printf("Command: %s, Number of tokens: %d\n", small_token_buffer.command_list[0], small_token_buffer.num_token);
+
+                    // Call translator for the entire command once, not inside a loop
+                    translator(small_token_buffer.command_list, small_token_buffer.num_token);
 
                     //free smaller tokens and reset variable
                     free_command_line(&small_token_buffer);
@@ -146,11 +165,16 @@ int main(int argc, char const *argv[]){
 
                 //free smaller tokens and reset variable
                 free_command_line (&large_token_buffer);
-                memset (&large_token_buffer, 0, 0);
+                //memset (&large_token_buffer, 0, 0);
             }
             fclose(inFPtr);
             //free line buffer
             free (line_buf);
+            printf("End of file\nBye Bye");
+
+            // Restore stdout back to the console
+            fclose(outFPtr); // Close the output file
+            freopen("/dev/tty", "w", stdout); // Restores stdout to terminal on UNIX-based systems
             return 0;
         } else{
             printf("Error! Proper usage: ./pseudo-shell or ./pseudo-shell -f <filename>");
