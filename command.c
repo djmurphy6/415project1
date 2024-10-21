@@ -3,10 +3,27 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <dirent.h>
+#include <errno.h>
 #include <sys/stat.h>
 #include <libgen.h>
 #include<fcntl.h>
 #include "command.h"
+
+//error handling to send perror to stdout
+void perror_stdout(const char *msg) {
+    // If there's a message, print it first
+    if (msg != NULL && strlen(msg) > 0) {
+        write(STDOUT_FILENO, msg, strlen(msg));
+        write(STDOUT_FILENO, ": ", 2);
+    }
+
+    // Get the error message string corresponding to errno
+    const char *error_msg = strerror(errno);
+    
+    // Write the error message to stdout
+    write(STDOUT_FILENO, error_msg, strlen(error_msg));
+    write(STDOUT_FILENO, "\n", 1);
+}
 
 /*for the ls command*/
 void listDir() {
@@ -14,16 +31,17 @@ void listDir() {
     struct dirent *entry;
 
     if(dir == NULL){
-        printf("opendir() error");
+        perror_stdout("opendir() error");
     }
 
     // read each file in dir
     while((entry = readdir(dir)) != NULL) {
-        printf("%s ", entry->d_name);  // Print the name of each entry
+        write(STDOUT_FILENO, entry->d_name, strlen(entry->d_name));
+        write(STDOUT_FILENO, " ", 1);  // Print a space between filenames
     }
 
     closedir(dir);
-    printf(" \n");
+    write(STDOUT_FILENO, "\n", 1);
 }
 
 /*for the pwd command*/
@@ -31,10 +49,11 @@ void showCurrentDir() {
     char *cwd = getcwd(NULL, 0);  // Let getcwd allocate the buffer
 
     if (cwd != NULL) {
-        printf("%s\n", cwd);
+        write(STDOUT_FILENO, cwd, strlen(cwd));
+        write(STDOUT_FILENO, "\n", 1);
         free(cwd); 
     } else {
-        printf("getcwd() error");
+        perror_stdout("getcwd() error");
     }
 }
 
@@ -42,7 +61,7 @@ void showCurrentDir() {
 void makeDir(char *dirName) { 
     int error = mkdir(dirName, 0777);
     if (error == -1) {
-        printf("Directory already exists!\n");
+        perror_stdout("mkdir error");
     }
 }
 
@@ -50,7 +69,7 @@ void makeDir(char *dirName) {
 void changeDir(char *dirName) {
     int result = chdir(dirName);
     if (result == -1) {
-        printf("Error: Could not change directory to '%s'.\n", dirName);
+        perror_stdout("chdir error");
     } 
 }
 
@@ -71,14 +90,14 @@ void copyFile(char *sourcePath, char *destinationPath) {
     // Open the source file for reading
     int src_fd = open(sourcePath, O_RDONLY);
     if (src_fd == -1) {
-        printf("Error opening source file\n");
+        perror_stdout("Error opening source file");
         return;
     }
 
     // Open/create destination file for writing
     int dest_fd = open(destinationPath, O_WRONLY | O_CREAT | O_TRUNC, 0644);
     if (dest_fd == -1) {
-        printf("Error opening destination file\n");
+        perror_stdout("Error opening destination file");
         close(src_fd);  //close the source file if destination fails
         return;
     }
@@ -91,7 +110,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
     while ((bytesRead = read(src_fd, buffer, sizeof(buffer))) > 0) {
         ssize_t bytesWritten = write(dest_fd, buffer, bytesRead);
         if (bytesWritten == -1) {
-            printf("Error writing to destination file\n");
+            perror_stdout("Error writing to destination file");
             close(src_fd);
             close(dest_fd);
             return;
@@ -100,7 +119,7 @@ void copyFile(char *sourcePath, char *destinationPath) {
 
     // Check if there was an error during reading
     if (bytesRead == -1) {
-        printf("Error reading source file\n");
+        perror_stdout("Error reading source file");
     }
 
     // Close the file descriptors
@@ -127,7 +146,7 @@ void displayFile(char *filename) {
     int fd;
 	fd = open(filename, O_RDONLY);
 	if (fd == -1) {
-        printf("Error opening file to display!\n");
+        perror_stdout("Error opening file to display!");
         return;
     }		
 			
@@ -142,7 +161,7 @@ void displayFile(char *filename) {
 	
     // Handle read error
     if (bytes == -1) {
-        printf("Error reading file!\n");
+        perror_stdout("Error reading file!");
     }
 
     close(fd);
