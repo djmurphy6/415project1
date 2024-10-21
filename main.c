@@ -147,7 +147,8 @@ int main(int argc, char const *argv[]){
                 for (int i = 0; large_token_buffer.command_list[i] != NULL; i++)
                 {
                     
-                    //printf("Large token buffer %s\n", large_token_buffer.command_list[i]);
+                    //printf("Large token buffer: %s\n", large_token_buffer.command_list[i]);
+                    fflush(stdout);
                     //tokenize large buffer
                     //smaller token is seperated by " "(space bar)
                     small_token_buffer = str_filler (large_token_buffer.command_list[i], " ");
@@ -160,7 +161,7 @@ int main(int argc, char const *argv[]){
 
                     //free smaller tokens and reset variable
                     free_command_line(&small_token_buffer);
-                    //memset (&small_token_buffer, 0, 0);
+                    memset (&small_token_buffer, 0, 0);
                 }
 
                 //free smaller tokens and reset variable
