@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <dirent.h>
 #include <sys/stat.h>
+#include <libgen.h>
 #include<fcntl.h>
 #include "command.h"
 
@@ -55,6 +56,18 @@ void changeDir(char *dirName) {
 
 /*for the cp command*/
 void copyFile(char *sourcePath, char *destinationPath) {
+    struct stat dest_stat;
+
+    // Check if the destination path is a directory
+    if (stat(destinationPath, &dest_stat) == 0 && S_ISDIR(dest_stat.st_mode)) {
+        // If destinationPath is a directory, append the file name to the destination
+        char *fileName = basename(sourcePath);  // Extract the file name from sourcePath
+        char fullDestPath[1024];  // Buffer to hold the new destination path
+        snprintf(fullDestPath, sizeof(fullDestPath), "%s/%s", destinationPath, fileName);
+        destinationPath = fullDestPath;
+    }
+
+
     // Open the source file for reading
     int src_fd = open(sourcePath, O_RDONLY);
     if (src_fd == -1) {
